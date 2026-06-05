@@ -1,0 +1,965 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESSIBILITY ENHANCEMENT LAYER
+   All rules prefixed with .a11y-* to avoid collisions with app styles.
+   Applied as classes on <html> element via accessibility-widget.tsx.
+   This file is unlayered so it overrides all Tailwind @layer styles.
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Custom Properties ─────────────────────────────────────────────────── */
+:root {
+  --a11y-font-scale: 1;
+  --a11y-focus-ring-color: #0034ff;
+  --a11y-focus-ring-width: 3px;
+  --a11y-focus-ring-offset: 3px;
+}
+
+/* ─── Text Scaling ───────────────────────────────────────────────────────── */
+html.a11y-scaled {
+  /* Scales all rem-based sizes relative to user's browser root */
+  font-size: calc(100% * var(--a11y-font-scale));
+}
+
+/* ─── High Contrast (Light) ─────────────────────────────────────────────── */
+html.a11y-high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 228 100% 38%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 93%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 88%;
+  --muted-foreground: 0 0% 10%;
+  --accent: 0 0% 88%;
+  --accent-foreground: 0 0% 0%;
+  --border: 0 0% 0%;
+  --input: 0 0% 0%;
+  --ring: 228 100% 38%;
+  --destructive: 0 100% 33%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+/* ─── High Contrast (Dark) ──────────────────────────────────────────────── */
+html.a11y-high-contrast.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 228 100% 70%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 85%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 100%;
+  --border: 0 0% 100%;
+  --input: 0 0% 100%;
+  --ring: 228 100% 70%;
+  --destructive: 0 100% 65%;
+  --destructive-foreground: 0 0% 0%;
+}
+
+/* Enforce border colour in high contrast */
+html.a11y-high-contrast *,
+html.a11y-high-contrast.dark * {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.a11y-high-contrast a:not([role="button"]):not([class*="btn"]),
+html.a11y-high-contrast.dark a:not([role="button"]):not([class*="btn"]) {
+  color: hsl(var(--primary)) !important;
+}
+
+/* ─── Underline Links ───────────────────────────────────────────────────── */
+html.a11y-underline-links a:not([role="button"]):not([class*="btn"]):not([class*="button"]) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* ─── Highlight Links ───────────────────────────────────────────────────── */
+html.a11y-highlight-links a:not([role="button"]):not([class*="btn"]) {
+  background-color: rgba(0, 52, 255, 0.1) !important;
+  border-bottom: 2px solid rgba(0, 52, 255, 0.45) !important;
+  border-radius: 2px !important;
+  padding-inline: 2px !important;
+}
+
+html.a11y-highlight-links a:not([role="button"]):not([class*="btn"]):hover,
+html.a11y-highlight-links a:not([role="button"]):not([class*="btn"]):focus {
+  background-color: rgba(0, 52, 255, 0.2) !important;
+}
+
+/* ─── Readable Font ─────────────────────────────────────────────────────── */
+html.a11y-readable-font,
+html.a11y-readable-font *:not(code):not(pre):not([class*="mono"]):not([class*="terminal"]) {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif !important;
+  letter-spacing: 0.018em !important;
+}
+
+/* Preserve monospace for code elements */
+html.a11y-readable-font code,
+html.a11y-readable-font pre,
+html.a11y-readable-font [class*="mono"],
+html.a11y-readable-font [class*="terminal"],
+html.a11y-readable-font kbd {
+  font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace !important;
+}
+
+/* ─── Dyslexia Friendly ─────────────────────────────────────────────────── */
+html.a11y-dyslexia p,
+html.a11y-dyslexia li,
+html.a11y-dyslexia td,
+html.a11y-dyslexia th,
+html.a11y-dyslexia label,
+html.a11y-dyslexia [class*="text"],
+html.a11y-dyslexia [class*="message"],
+html.a11y-dyslexia [class*="content"] {
+  line-height: 1.85 !important;
+  letter-spacing: 0.06em !important;
+  word-spacing: 0.12em !important;
+}
+
+/* ─── Large Cursor ──────────────────────────────────────────────────────── */
+html.a11y-large-cursor,
+html.a11y-large-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M8 3 L8 29 L14 22 L21 36 L26 33 L19 20 L28 20 Z' fill='%23000000' stroke='%23ffffff' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E") 8 3, auto !important;
+}
+
+html.a11y-large-cursor a,
+html.a11y-large-cursor button,
+html.a11y-large-cursor [role="button"],
+html.a11y-large-cursor input,
+html.a11y-large-cursor select,
+html.a11y-large-cursor textarea,
+html.a11y-large-cursor label,
+html.a11y-large-cursor [tabindex] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='14' fill='%23000000' stroke='%23ffffff' stroke-width='2.5'/%3E%3C/svg%3E") 18 18, pointer !important;
+}
+
+/* ─── Large Targets ─────────────────────────────────────────────────────── */
+html.a11y-large-targets button,
+html.a11y-large-targets [role="button"],
+html.a11y-large-targets a,
+html.a11y-large-targets input[type="checkbox"],
+html.a11y-large-targets input[type="radio"],
+html.a11y-large-targets input[type="submit"],
+html.a11y-large-targets input[type="button"],
+html.a11y-large-targets select {
+  min-height: 44px !important;
+  min-width: 44px !important;
+}
+
+/* Preserve compact icon buttons by adding hit-area padding */
+html.a11y-large-targets button[class*="icon"],
+html.a11y-large-targets button[aria-label] {
+  padding: 10px !important;
+}
+
+/* ─── Highlight Focus ───────────────────────────────────────────────────── */
+html.a11y-highlight-focus *:focus-visible {
+  outline: 3px solid #0034ff !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 6px rgba(0, 52, 255, 0.18), 0 0 0 3px #0034ff !important;
+  border-radius: 4px !important;
+}
+
+html.a11y-highlight-focus.dark *:focus-visible {
+  outline-color: #4d79ff !important;
+  box-shadow: 0 0 0 6px rgba(77, 121, 255, 0.25), 0 0 0 3px #4d79ff !important;
+}
+
+/* ─── Highlight Headings ────────────────────────────────────────────────── */
+html.a11y-highlight-headings h1,
+html.a11y-highlight-headings h2,
+html.a11y-highlight-headings h3,
+html.a11y-highlight-headings h4,
+html.a11y-highlight-headings h5,
+html.a11y-highlight-headings h6 {
+  outline: 2px dashed rgba(0, 52, 255, 0.4) !important;
+  outline-offset: 2px !important;
+  background-color: rgba(0, 52, 255, 0.05) !important;
+  border-left: 4px solid rgba(0, 52, 255, 0.6) !important;
+  padding-left: 8px !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+
+html.a11y-highlight-headings.dark h1,
+html.a11y-highlight-headings.dark h2,
+html.a11y-highlight-headings.dark h3,
+html.a11y-highlight-headings.dark h4,
+html.a11y-highlight-headings.dark h5,
+html.a11y-highlight-headings.dark h6 {
+  background-color: rgba(77, 121, 255, 0.1) !important;
+  border-left-color: rgba(77, 121, 255, 0.7) !important;
+  outline-color: rgba(77, 121, 255, 0.5) !important;
+}
+
+/* ─── Highlight Landmarks ───────────────────────────────────────────────── */
+html.a11y-highlight-landmarks [role="banner"],
+html.a11y-highlight-landmarks header {
+  outline: 2px solid rgba(255, 100, 0, 0.5) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 100, 0, 0.2) !important;
+  position: relative !important;
+}
+
+html.a11y-highlight-landmarks [role="navigation"],
+html.a11y-highlight-landmarks nav {
+  outline: 2px solid rgba(0, 160, 0, 0.5) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 160, 0, 0.2) !important;
+}
+
+html.a11y-highlight-landmarks [role="main"],
+html.a11y-highlight-landmarks main {
+  outline: 2px solid rgba(0, 52, 255, 0.45) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 52, 255, 0.15) !important;
+}
+
+html.a11y-highlight-landmarks [role="complementary"],
+html.a11y-highlight-landmarks aside {
+  outline: 2px solid rgba(160, 0, 160, 0.45) !important;
+  box-shadow: inset 0 0 0 1px rgba(160, 0, 160, 0.15) !important;
+}
+
+html.a11y-highlight-landmarks [role="contentinfo"],
+html.a11y-highlight-landmarks footer {
+  outline: 2px solid rgba(0, 160, 160, 0.45) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 160, 160, 0.15) !important;
+}
+
+html.a11y-highlight-landmarks form {
+  outline: 2px solid rgba(200, 140, 0, 0.5) !important;
+}
+
+/* ─── Reduce Motion ─────────────────────────────────────────────────────── */
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Also honour the OS-level media query */
+@media (prefers-reduced-motion: reduce) {
+  .a11y-panel {
+    transition: none !important;
+  }
+}
+
+/* ─── Pause Animations ──────────────────────────────────────────────────── */
+html.a11y-pause-animations *,
+html.a11y-pause-animations *::before,
+html.a11y-pause-animations *::after {
+  animation-play-state: paused !important;
+}
+
+/* ─── Stop Carousels ────────────────────────────────────────────────────── */
+html.a11y-stop-carousels [data-autoplay],
+html.a11y-stop-carousels [class*="carousel"][class*="playing"],
+html.a11y-stop-carousels [class*="slider"][class*="auto"] {
+  animation-play-state: paused !important;
+}
+
+/* ─── Keyboard Navigation (skip link activation) ────────────────────────── */
+html.a11y-keyboard-nav .a11y-skip-link {
+  display: flex !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WIDGET COMPONENT STYLES
+   The floating button and side panel.
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Skip Link ─────────────────────────────────────────────────────────── */
+.a11y-skip-link {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(calc(-100% - 20px));
+  z-index: 999999;
+  background: #0034ff;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 52, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none;
+  align-items: center;
+}
+
+.a11y-skip-link:focus {
+  transform: translateX(-50%) translateY(0);
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  display: flex;
+}
+
+/* ─── Floating Action Button ────────────────────────────────────────────── */
+.a11y-fab {
+  position: fixed;
+  z-index: 99998;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22), 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 200ms ease;
+  outline: none;
+  padding: 0;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.a11y-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28), 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.a11y-fab:active {
+  transform: scale(0.94);
+}
+
+.a11y-fab:focus-visible {
+  outline: 3px solid #0034ff;
+  outline-offset: 3px;
+}
+
+/* Colour variants based on background detection */
+.a11y-fab.fab-on-light {
+  background-color: #0034ff;
+  color: #ffffff;
+}
+
+.a11y-fab.fab-on-dark {
+  background-color: #ffffff;
+  color: #0034ff;
+}
+
+/* Placement variants */
+.a11y-fab.placement-bottom-right {
+  bottom: 24px;
+  right: 24px;
+}
+
+.a11y-fab.placement-bottom-left {
+  bottom: 24px;
+  left: 24px;
+}
+
+.a11y-fab.placement-middle-right {
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+}
+
+.a11y-fab.placement-middle-left {
+  top: 50%;
+  left: 24px;
+  transform: translateY(-50%);
+}
+
+.a11y-fab.placement-top-right {
+  top: 80px;
+  right: 24px;
+}
+
+.a11y-fab.placement-top-left {
+  top: 80px;
+  left: 24px;
+}
+
+/* Middle-placement hover overrides (keep centered) */
+.a11y-fab.placement-middle-right:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.a11y-fab.placement-middle-left:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.a11y-fab.placement-middle-right:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.a11y-fab.placement-middle-left:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* Panel open state: dim FAB */
+.a11y-fab[aria-expanded="true"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Reduce motion respects OS setting */
+@media (prefers-reduced-motion: reduce) {
+  .a11y-fab {
+    transition: none;
+  }
+}
+
+html.a11y-reduce-motion .a11y-fab {
+  transition: none !important;
+}
+
+/* ─── Panel ─────────────────────────────────────────────────────────────── */
+.a11y-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 440px;
+  max-width: calc(100vw - 8px);
+  z-index: 99999;
+  background: #f4f6f9;
+  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.18), -1px 0 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(102%);
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px 0 0 20px;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+}
+
+.a11y-panel.is-open {
+  transform: translateX(0);
+}
+
+html.a11y-reduce-motion .a11y-panel {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a11y-panel {
+    transition: none !important;
+  }
+}
+
+/* ─── Panel Header ──────────────────────────────────────────────────────── */
+.a11y-panel-header {
+  background: linear-gradient(145deg, #0034ff 0%, #0026cc 100%);
+  color: #ffffff;
+  padding: 20px 20px 18px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.a11y-panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.a11y-panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.a11y-panel-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.a11y-panel-subtitle {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.a11y-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.a11y-close-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.a11y-close-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.a11y-close-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Active Profile Badge ──────────────────────────────────────────────── */
+.a11y-active-profile-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Panel Body ────────────────────────────────────────────────────────── */
+.a11y-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+
+.a11y-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.a11y-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.a11y-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+/* ─── Section Label ─────────────────────────────────────────────────────── */
+.a11y-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 14px 0 7px;
+  padding: 0 2px;
+}
+
+.a11y-section-label:first-child {
+  margin-top: 0;
+}
+
+/* ─── Profiles Grid ─────────────────────────────────────────────────────── */
+.a11y-profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+/* ─── Profile Card ──────────────────────────────────────────────────────── */
+.a11y-profile-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  outline: none;
+  transition: border-color 150ms ease, background-color 150ms ease,
+    box-shadow 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.a11y-profile-card:hover {
+  border-color: #0034ff;
+  background: rgba(0, 52, 255, 0.03);
+  box-shadow: 0 2px 8px rgba(0, 52, 255, 0.12);
+}
+
+.a11y-profile-card:focus-visible {
+  outline: 3px solid #0034ff;
+  outline-offset: 2px;
+}
+
+.a11y-profile-card.is-active {
+  border-color: #0034ff;
+  background: rgba(0, 52, 255, 0.07);
+  box-shadow: 0 2px 10px rgba(0, 52, 255, 0.16);
+}
+
+.a11y-profile-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 18px;
+}
+
+.a11y-profile-card.is-active .a11y-profile-icon {
+  color: #0034ff;
+}
+
+.a11y-profile-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+  line-height: 1.2;
+}
+
+.a11y-profile-card.is-active .a11y-profile-name {
+  color: #0034ff;
+}
+
+/* ─── Controls Grid ─────────────────────────────────────────────────────── */
+.a11y-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+}
+
+/* ─── Control Card ──────────────────────────────────────────────────────── */
+.a11y-control-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+  outline: none;
+  position: relative;
+  transition: border-color 150ms ease, background-color 150ms ease,
+    box-shadow 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.a11y-control-card:hover {
+  border-color: #0034ff;
+  background: rgba(0, 52, 255, 0.03);
+  box-shadow: 0 2px 8px rgba(0, 52, 255, 0.1);
+}
+
+.a11y-control-card:focus-visible {
+  outline: 3px solid #0034ff;
+  outline-offset: 2px;
+}
+
+.a11y-control-card.is-active {
+  border-color: #0034ff;
+  background: rgba(0, 52, 255, 0.07);
+  box-shadow: 0 2px 10px rgba(0, 52, 255, 0.14);
+}
+
+.a11y-control-card:active {
+  transform: scale(0.97);
+}
+
+.a11y-control-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.a11y-control-card.is-active .a11y-control-icon {
+  color: #0034ff;
+}
+
+.a11y-control-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #4b5563;
+  line-height: 1.25;
+}
+
+.a11y-control-card.is-active .a11y-control-label {
+  color: #0034ff;
+}
+
+/* ON badge */
+.a11y-on-badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #0034ff;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+/* ─── Text Scale Card ───────────────────────────────────────────────────── */
+.a11y-text-scale-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  grid-column: span 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.a11y-text-scale-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 11px;
+}
+
+.a11y-text-scale-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.a11y-text-scale-title svg {
+  color: #6b7280;
+}
+
+.a11y-scale-reset-link {
+  font-size: 11px;
+  color: #6b7280;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 3px 6px;
+  border-radius: 5px;
+  transition: background-color 150ms ease;
+}
+
+.a11y-scale-reset-link:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.a11y-scale-reset-link:focus-visible {
+  outline: 3px solid #0034ff;
+  outline-offset: 2px;
+}
+
+.a11y-scale-reset-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.a11y-text-scale-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a11y-scale-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1;
+  transition: background-color 150ms ease, border-color 150ms ease,
+    color 150ms ease;
+  padding: 0;
+}
+
+.a11y-scale-btn:hover:not(:disabled) {
+  background: #eff2ff;
+  border-color: #0034ff;
+  color: #0034ff;
+}
+
+.a11y-scale-btn:focus-visible {
+  outline: 3px solid #0034ff;
+  outline-offset: 2px;
+}
+
+.a11y-scale-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.a11y-scale-btn:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+.a11y-scale-track-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.a11y-scale-track {
+  height: 5px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.a11y-scale-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0034ff 0%, #3366ff 100%);
+  border-radius: 3px;
+  transition: width 200ms ease;
+}
+
+.a11y-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.a11y-scale-current {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0034ff;
+  min-width: 38px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ─── Screen Reader Notice ──────────────────────────────────────────────── */
+.a11y-sr-notice {
+  background: rgba(0, 52, 255, 0.05);
+  border: 1px solid rgba(0, 52, 255, 0.18);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.55;
+  margin-top: 4px;
+}
+
+.a11y-sr-notice strong {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+/* ─── Panel Footer ──────────────────────────────────────────────────────── */
+.a11y-panel-footer {
+  flex-shrink: 0;
+  padding: 12px 14px 14px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.a11y-reset-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 2px solid #dc2626;
+  background: transparent;
+  color: #dc2626;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.a11y-reset-btn:hover {
+  background: #fef2f2;
+}
+
+.a11y-reset-btn:focus-visible {
+  outline: 3px solid #dc2626;
+  outline-offset: 2px;
+}
+
+.a11y-reset-btn:active {
+  background: #fee2e2;
+}
+
+.a11y-footer-hint {
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.a11y-footer-hint kbd {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #374151;
+}
+
+/* ─── Live Announce Region (visually hidden) ────────────────────────────── */
+.a11y-live-region {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ─── Spacer between sections ───────────────────────────────────────────── */
+.a11y-section-spacer {
+  height: 6px;
+}
