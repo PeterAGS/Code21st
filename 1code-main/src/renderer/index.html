@@ -14,6 +14,39 @@
         document.documentElement.classList.add(theme);
       })();
     </script>
+    <!-- Accessibility boot: re-apply saved preferences before React renders to prevent FOUC -->
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('accessibilityPreferences.v1');
+          if (!raw) return;
+          var p = JSON.parse(raw);
+          if (!p || p.version !== 1) return;
+          var h = document.documentElement;
+          var scales = [0.9, 1, 1.1, 1.25, 1.5, 1.75, 2.0];
+          if (p.contrast === 'high') h.classList.add('a11y-high-contrast');
+          if (p.underlineLinks) h.classList.add('a11y-underline-links');
+          if (p.highlightLinks) h.classList.add('a11y-highlight-links');
+          if (p.readableFont) h.classList.add('a11y-readable-font');
+          if (p.dyslexiaFriendly) h.classList.add('a11y-dyslexia');
+          if (p.largeCursor) h.classList.add('a11y-large-cursor');
+          if (p.largeTargets) h.classList.add('a11y-large-targets');
+          if (p.highlightFocus) h.classList.add('a11y-highlight-focus');
+          if (p.highlightHeadings) h.classList.add('a11y-highlight-headings');
+          if (p.highlightLandmarks) h.classList.add('a11y-highlight-landmarks');
+          if (p.reduceMotion) h.classList.add('a11y-reduce-motion');
+          if (p.pauseAnimations) h.classList.add('a11y-pause-animations');
+          if (p.stopCarousels) h.classList.add('a11y-stop-carousels');
+          if (p.keyboardNav) h.classList.add('a11y-keyboard-nav');
+          var idx = typeof p.textScaleIndex === 'number' ? p.textScaleIndex : 1;
+          var scale = scales[idx];
+          if (scale && scale !== 1) {
+            h.style.setProperty('--a11y-font-scale', String(scale));
+            h.classList.add('a11y-scaled');
+          }
+        } catch (e) { /* ignore parse/storage errors */ }
+      })();
+    </script>
     <style>
       /* Loading state before React loads - respects system theme */
       :root {

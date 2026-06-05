@@ -3,6 +3,7 @@ import { ThemeProvider, useTheme } from "next-themes"
 import { useEffect, useMemo } from "react"
 import { Toaster } from "sonner"
 import { TooltipProvider } from "./components/ui/tooltip"
+import { AccessibilityWidget } from "./components/accessibility/accessibility-widget"
 import { TRPCProvider } from "./contexts/TRPCProvider"
 import { WindowProvider, getInitialWindowParams } from "./contexts/WindowContext"
 import { selectedProjectAtom, selectedAgentChatIdAtom } from "./features/agents/atoms"
@@ -184,6 +185,7 @@ export function App() {
                   <AppContent />
                 </div>
                 <ThemedToaster />
+                <AccessibilityWidget />
               </TRPCProvider>
             </TooltipProvider>
           </VSCodeThemeProvider>

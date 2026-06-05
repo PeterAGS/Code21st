@@ -1,4 +1,5 @@
 @import "./agents-styles.css";
+@import "./accessibility.css";
 
 @source "../../../node_modules/streamdown/dist/*.js";
 
